@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+  <include file="$(find-pkg-share sim_pkg)/launch/gazebo.launch">
+    <arg name="gui" value="false"/>
+  </include>
+  <include file="$(find-pkg-share sim_pkg)/launch/sublaunchers/car.launch"/>
+</launch>
