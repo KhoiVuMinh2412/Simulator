@@ -28,96 +28,82 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
+from std_msgs.msg import Float64MultiArray, String
+from .lane_keeping import LaneController
+import numpy as np
 import json
-from pynput import keyboard
 
-from .RcBrainThread import RcBrainThread
-from std_msgs.msg import String
 import rclpy
+from rclpy.node import Node
 
-class RemoteControlTransmitterProcess():
+class RemoteControlTransmitterProcess(Node):
     # ===================================== INIT==========================================
     def __init__(self):
-        """Run on the PC. It forwards the commans from the user via KeboardListenerThread to the RcBrainThread. 
-        The RcBrainThread converts them into actual commands and sends them to the remote via a socket connection.
-        
         """
-        self.dirKeys   = ['w', 'a', 's', 'd']
-        self.paramKeys = ['t','g','y','h','u','j','i','k', 'r', 'p']
-        self.pidKeys = ['z','x','v','b','n','m']
-
-        self.allKeys = self.dirKeys + self.paramKeys + self.pidKeys
-        
-        self.rcBrain   =  RcBrainThread()   
-        
-        rclpy.init()
-        node = rclpy.create_node('EXAMPLEnode')     
-        self.publisher = node.create_publisher(String, '/automobile/command', 1)
-
-    # ===================================== RUN ==========================================
-    def run(self):
-        """Apply initializing methods and start the threads. 
+        Process the lane polynomials and publishes the command for the car.
         """
-        with keyboard.Listener(on_press = self.keyPress, on_release = self.keyRelease) as listener: 
-            print("joining...")
-            listener.join()
-
-    # ===================================== KEY PRESS ====================================
-    def keyPress(self,key):
-        """Processing the key pressing 
+        super().__init__('control_node')
         
-        Parameters
-        ----------
-        key : pynput.keyboard.Key
-            The key pressed
-        """                                     
-        print(key)
-        if key.char in self.allKeys:
-            keyMsg = 'p.' + str(key.char)
-
-            self._send_command(keyMsg)
+        self.publisher = self.create_publisher(String, '/automobile/command', 1)
         
-    # ===================================== KEY RELEASE ==================================
-    def keyRelease(self, key):
-        """Processing the key realeasing.
+        self.left_poly_sub = self.create_subscription(Float64MultiArray, 'lane/left_poly', self.left_poly_callback, 10)
+        self.right_poly_sub = self.create_subscription(Float64MultiArray, 'lane/right_poly', self.right_poly_callback, 10)
         
-        Parameters
-        ----------
-        key : pynput.keyboard.Key
-            The key realeased. 
+        self.current_left_poly = None
+        self.current_right_poly = None
         
-        """ 
-        if key == keyboard.Key.esc:                        #exit key      
-            self.publisher.publish(String(data='{"action":"3","steerAngle":0.0}'))
-            return False
+        self.controller = LaneController()
 
-        if key.char in self.allKeys:
-            keyMsg = 'r.'+str(key.char)
+    def left_poly_callback(self, msg):
+        self.current_left_poly = msg
+        self.check_and_compute()
 
-            self._send_command(keyMsg)
-                 
-    # ===================================== SEND COMMAND =================================
-    def _send_command(self, key):
-        """Transmite the command to the remotecontrol receiver. 
-        
-        Parameters
-        ----------
-        inP : Pipe
-            Input pipe. 
-        """
-        command = self.rcBrain.getMessage(key)
-        if command is not None:
-	
-            command = json.dumps(command)
-            command = String(data=command)
-            self.publisher.publish(command)  
+    def right_poly_callback(self, msg):
+        self.current_right_poly = msg
+        self.check_and_compute()
+
+    def check_and_compute(self):
+        if self.current_left_poly is not None and self.current_right_poly is not None:
+            self.lane_data_callback(self.current_left_poly, self.current_right_poly)
+            # Reset after processing to wait for new pair
+            self.current_left_poly = None
+            self.current_right_poly = None
+
+    def lane_data_callback(self, left_poly_msg, right_poly_msg):
+        # 1. Extract the data
+        left_coeffs = np.array(left_poly_msg.data)
+        right_coeffs = np.array(right_poly_msg.data)
+
+        left_poly = np.poly1d(left_coeffs)
+        right_poly = np.poly1d(right_coeffs)
+
+        # 2. Call your lane keeping algorithm
+        steer, speed, state = self.controller.get_control(left_poly, right_poly)
+
+        # 3. Create and publish the command
+        # Send Speed
+        # Convert cm/s (controller) to m/s (gazebo)
+        speed_cmd = {
+            "action": "1",
+            "speed": float(speed) / 100.0
+        }
+        self.publisher.publish(String(data=json.dumps(speed_cmd)))
+
+        # Send Steer
+        steer_cmd = {
+            "action": "2",
+            "steerAngle": float(steer)
+        }
+        self.publisher.publish(String(data=json.dumps(steer_cmd)))
 
 
-def main():
+def main(args=None):
+    rclpy.init(args=args)
     nod = RemoteControlTransmitterProcess()
-    nod.run()
-            
+    rclpy.spin(nod)
+    nod.destroy_node()
+    rclpy.shutdown()
+
 
 if __name__ == '__main__':
-    nod = RemoteControlTransmitterProcess()
-    nod.run()
+    main()
