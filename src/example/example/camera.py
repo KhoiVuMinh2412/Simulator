@@ -30,38 +30,80 @@
 
 
 import rclpy
+from rclpy.node import Node
 import cv2
 import numpy as np
+from .lane_detection import LaneDetector
+from std_msgs.msg import Float64MultiArray
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
+from rclpy.node import Node
 
-class CameraHandler():
+
+class CameraHandler(Node):
     # ===================================== INIT==========================================
     def __init__(self):
         """
         Creates a bridge for converting the image from Gazebo image intro OpenCv image
         """
+        super().__init__('camera_node')
         self.bridge = CvBridge()
         self.cv_image = np.zeros((640, 480))
-        rclpy.init()
-        node = rclpy.create_node('CAMnod')
+        self.detector = LaneDetector(img_w=640, img_h=480)
+
+        self.left_poly_pub = self.create_publisher(Float64MultiArray, 'lane/left_poly', 10)
+        self.right_poly_pub = self.create_publisher(Float64MultiArray, 'lane/right_poly', 10)
+        
         # TODO: Changed from "/automobile/image_raw", I don't understand why.
-        self.image_sub = node.create_subscription(Image, "/camera1/image_raw", self.callback, 10)
-        rclpy.spin(node)
+        self.image_sub = self.create_subscription(Image, "/camera1/image_raw", self.callback, 10)
 
     def callback(self, data):
         """
         :param data: sensor_msg array containing the image in the Gazsbo format
         :return: nothing but sets [cv_image] to the usefull image that can be use in opencv (numpy array)
         """
+        self.get_logger().info("Image received from Gazebo") # Debug print
         self.cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+        binary_warped, warped_color = self.detector.preprocess(self.cv_image)
+        left_poly, right_poly = self.detector.find_lanes(binary_warped=binary_warped)
+
+        if left_poly is not None and right_poly is not None:
+            self.get_logger().info("Lanes detected! Publishing...") # Debug print
+            left_poly_msg = Float64MultiArray()
+            # If left_poly is a numpy.poly1d object or numpy array wrapping it
+            if hasattr(left_poly, 'c'): # Check if it's a poly1d object which has coefficients 'c'
+                left_poly_msg.data = left_poly.c.tolist()
+            else:
+                 left_poly_msg.data = left_poly.tolist()
+
+            right_poly_msg = Float64MultiArray()
+            if hasattr(right_poly, 'c'):
+                 right_poly_msg.data = right_poly.c.tolist()
+            else:
+                right_poly_msg.data = right_poly.tolist()
+
+            self.left_poly_pub.publish(left_poly_msg)
+            self.right_poly_pub.publish(right_poly_msg)
+        else:
+            self.get_logger().warn("No lanes found.") # Debug print
+
+        # Stack the raw image and the binary debug view for visualization
+        # Convert binary (0/1) to (0/255) for display and make it 3-channel
+        debug_view = np.dstack((binary_warped*255, binary_warped*255, binary_warped*255))
+        debug_view = cv2.resize(debug_view, (640, 480)) # Ensure size matches if needed
+        
         cv2.imshow("Frame preview", self.cv_image)
+        cv2.imshow("Debug View (What computer sees)", debug_view)
         key = cv2.waitKey(1)
     
 
-def main():
+def main(args=None):
+    rclpy.init(args=args)
     nod = CameraHandler()
+    rclpy.spin(nod)
+    nod.destroy_node()
+    rclpy.shutdown()
 
 
 if __name__ == '__main__':
-    nod = CameraHandler()
+    main()
