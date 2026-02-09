@@ -46,7 +46,7 @@
     <!-- 0.261799388 -->
     <include>
       <uri>model://camera</uri>
-      <pose>0 0 0.2 0 0.2617 0</pose>
+      <pose>0 0 0.2 0 0.6108 0</pose>
       <name>camera</name>
     </include>
 
