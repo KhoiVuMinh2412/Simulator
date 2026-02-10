@@ -20,25 +20,25 @@
     <!-- including a left steering comp. -->
     <include>
       <uri>model://steering_column</uri>
-      <pose>0.112 0.0725 0 0 0 0</pose>
+      <pose>0.107 0.0725 0 0 0 0</pose>
       <name>steer_left</name>
     </include>
     <!-- including a right steering comp. -->
     <include>
       <uri>model://steering_column</uri>
-      <pose>0.112 -0.0725 0 0 0 0</pose>
+      <pose>0.107 -0.0725 0 0 0 0</pose>
       <name>steer_right</name>
     </include>
     <!-- including a left front wheel -->
     <include>
       <uri>model://wheel_left</uri>
-      <pose>0.118 0.081 0 0 0 0</pose>
+      <pose>0.113 0.081 0 0 0 0</pose>
       <name>wheel_front_left</name>
     </include>
     <!-- including a right front wheel -->
     <include>
       <uri>model://wheel_right</uri>
-      <pose>0.118 -0.081 0 0 0 0</pose>
+      <pose>0.113 -0.081 0 0 0 0</pose>
       <name>wheel_front_right</name>
     </include>
     
@@ -306,7 +306,7 @@
 
     <!-- Plugin  -->
     <plugin name='CarLikeRobotPlugin' filename='libcar_plugin.so'>
-      <wheelbase>0.26</wheelbase>
+      <wheelbase>0.265</wheelbase>
       <axletrack>0.162</axletrack>
       <wheelradius>0.0325</wheelradius>
       <speed_wheel_joints> 

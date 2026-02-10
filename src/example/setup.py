@@ -17,6 +17,7 @@ setup(
         'console_scripts': [
             'control = example.control:main',
             'camera = example.camera:main',
+            'reset_car = example.reset_car:main',
         ],
     },
 )

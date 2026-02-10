@@ -6,7 +6,7 @@
   <include file="$(find-pkg-share gazebo_ros)/launch/gzserver.launch.py">
     <arg name="verbose" value="true" />
     <arg name="world" value="$(find-pkg-share sim_pkg)/worlds/world_with_separators.world" />
-    <arg name="extra_gazebo_args" value="--server-plugin libgazebo_ros_init.so --server-plugin libgazebo_ros_factory.so" />
+    <arg name="extra_gazebo_args" value="--server-plugin libgazebo_ros_init.so --server-plugin libgazebo_ros_factory.so --server-plugin libgazebo_ros_state.so" />
   </include>
 
   <include if="$(var gui)" file="$(find-pkg-share gazebo_ros)/launch/gzclient.launch.py">

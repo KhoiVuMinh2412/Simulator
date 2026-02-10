@@ -60,7 +60,35 @@
 			<cast_shadows>false</cast_shadows>
 		</light>
 
-
+    <!-- Added Ground Plane to fill the void -->
+    <model name="ground_plane">
+      <static>true</static>
+      <pose>0 0 -0.01 0 0 0</pose> <!-- Slightly below track -->
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/DarkGrey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
 
 		<include>
 			<scale> 1 1 1 </scale>

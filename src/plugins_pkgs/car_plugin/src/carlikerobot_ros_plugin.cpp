@@ -32,7 +32,7 @@ namespace gazebo
                 RCLCPP_INFO_STREAM(logger, "====================================================================");
                 RCLCPP_INFO_STREAM(logger, "publish to: "  << topicName);
                 RCLCPP_INFO_STREAM(logger, "listen to: "  << listen_topicName);
-                RCLCPP_INFO_STREAM(logger, "Usefull data: /Response for ack, /Command for speed and steer");
+                RCLCPP_INFO_STREAM(logger, "Useful data: /Response for ack, /Command for speed and steer");
                 RCLCPP_INFO_STREAM(logger, "====================================================================");
             }
         }
@@ -53,11 +53,11 @@ namespace gazebo
 			    std::string command = doc["action"].GetString();
 		    	if(command =="1")
 		    	{
-		    		if (DEBUG){RCLCPP_INFO_STREAM(logger, "Received SPED message");}
+		    		if (DEBUG){RCLCPP_INFO_STREAM(logger, "Received SPEED message");}
 		    		if (doc.HasMember("speed")){ this->spedMessage(doc["speed"].GetFloat());}
 		    		else{RCLCPP_INFO_STREAM(logger, "Invalid message"); this->unknownMessage();}
 		    	} else if (command =="2") {
-				    if (DEBUG){RCLCPP_INFO_STREAM(logger, "Received STER message");}
+				    if (DEBUG){RCLCPP_INFO_STREAM(logger, "Received STEER message");}
 				    if (doc.HasMember("steerAngle")){ this->sterMessage(doc["steerAngle"].GetFloat());}
 		    		else{RCLCPP_INFO_STREAM(logger, "Invalid message"); this->unknownMessage();}
 		    	} else if (command =="3") {
