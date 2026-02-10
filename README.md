@@ -67,7 +67,7 @@ You can launch the map with just the car, or with all environment objects (signs
     ```bash
     just car-only
     ```
-    *Equivalent to: `ros2 launch sim_pkg map_with_car.launch`*
+    *Equivalent to: `./ros_exec.sh ros2 launch sim_pkg map_with_car.launch`*
 
 *   **All Objects**:
     ```bash
