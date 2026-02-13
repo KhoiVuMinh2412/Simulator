@@ -97,8 +97,8 @@ class LaneController:
 
     def _select_target_path(self, left_poly, right_poly):
         if left_poly is not None and right_poly is not None:
-            avg_coeffs = (left_poly.coeffs + right_poly.coeffs) / 2
-            return np.poly1d(avg_coeffs), "C" #center
+            avg_poly = (left_poly + right_poly) / 2
+            return avg_poly, "C" #center
         elif left_poly is not None:
             return left_poly, "RO" #right_offset 
         elif right_poly is not None:
