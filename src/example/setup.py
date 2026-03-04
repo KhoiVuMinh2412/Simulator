@@ -1,4 +1,5 @@
 from setuptools import find_packages, setup
+from glob import glob
 
 package_name = 'example'
 
@@ -17,6 +18,7 @@ setup(
         'console_scripts': [
             'control = example.control:main',
             'camera = example.camera:main',
+            'sign_detector = example.sign_detector:main',
             'reset_car = example.reset_car:main',
         ],
     },

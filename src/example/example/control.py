@@ -31,12 +31,15 @@
 from std_msgs.msg import Float64MultiArray, String
 # from .lane_keeping import LaneController
 from .lane_keeping_PID import LaneController
-from .RcBrainThread import RcBrainThread # Added RcBrainThread
+# from .lane_keeping_Stanley import LaneController
+from .RcBrainThread import RcBrainThread
+from .modeChanger import StateChanger
+from .systemMode import CarMode, CarSpeed
 import numpy as np
 import json
-import sys, select, termios, tty # Added for manual control
-import threading # Added for manual control
-import time # Added for timestamp logic
+import sys, select, termios, tty
+import threading
+import time
 
 import rclpy
 from rclpy.node import Node
@@ -59,6 +62,20 @@ class RemoteControlTransmitterProcess(Node):
         
         self.controller = LaneController()
 
+        # ── State Machine (sign-detection driven) ──────────────────────
+        self.state_changer = StateChanger()
+        self.prev_car_mode = CarMode.STRAIGHT
+        self.prev_car_speed = CarSpeed.NORMAL
+        self.last_state_time = time.time()
+
+        # Subscribe to sign detections published by sign_detector node
+        self.det_sub = self.create_subscription(
+            Float64MultiArray, 'sign/detections',
+            self.detection_callback, 10)
+
+        # Periodic timer to tick state-changer elapsed time (10 Hz)
+        self.state_timer = self.create_timer(0.1, self.state_timer_callback)
+
         # MANUAL CONTROL SETUP
         self.manual_mode = False
         self.settings = termios.tcgetattr(sys.stdin)
@@ -74,6 +91,12 @@ class RemoteControlTransmitterProcess(Node):
         self.key_timestamps = {}
         self.key_timeout = 0.2 # Seconds before considering a key released
 
+        # Dashboard state
+        self._dash_steer = 0.0
+        self._dash_speed = 0.0
+        self._dash_lane = ''
+        self._dash_detections = []
+
         self.print_instructions()
         
         # Start keyboard thread
@@ -82,22 +105,42 @@ class RemoteControlTransmitterProcess(Node):
         self.key_thread.start()
 
     def print_instructions(self):
-        print("\n==============================================")
-        print("          CONTROL NODE STARTED             ")
-        print("==============================================")
-        print("Default Mode: AUTONOMOUS")
-        print("Press 'TAB' to toggle MANUAL/AUTONOMOUS mode")
-        print("\nMANUAL CONTROLS (RcBrain):")
-        print("   w/s : Speed + / -")
-        print("   a/d : Steer Left / Right")
-        print("   Space : Brake")
-        print("   t/g : Max Speed + / -")
-        print("   y/h : Max Steer + / -")
-        print("   u/j : Speed Step + / -")
-        print("   i/k : Steer Step + / -")
-        print("   r : Reset Params")
-        print("   p : PID Toggle")
-        print("==============================================\n")
+        print("\n" + "=" * 50)
+        print("           CONTROL NODE STARTED")
+        print("=" * 50)
+        print("  Default Mode : AUTONOMOUS")
+        print("  TAB          : Toggle MANUAL / AUTONOMOUS")
+        print("-" * 50)
+        print("  MANUAL CONTROLS (RcBrain):")
+        print("  w/s   Speed +/-    a/d   Steer L/R")
+        print("  Space Brake        t/g   Max Speed +/-")
+        print("  y/h   Max Steer    u/j   Speed Step +/-")
+        print("  i/k   Steer Step   r     Reset Params")
+        print("  p     PID Toggle")
+        print("=" * 50 + "\n")
+
+    # ── Dashboard ───────────────────────────────────────────────────
+    def _print_dashboard(self):
+        """Print a single-line status bar using carriage return to overwrite."""
+        mode_str = "MANUAL" if self.manual_mode else "AUTO"
+        car_mode = self.state_changer._get_mode().name
+        car_speed = self.state_changer._get_speed().name
+
+        det_str = ','.join(self._dash_detections) if self._dash_detections else '-'
+
+        line = (
+            f"[{mode_str}] "
+            f"mode={car_mode:<12s} "
+            f"spd_mode={car_speed:<7s} "
+            f"steer={self._dash_steer:>6.1f}  "
+            f"speed={self._dash_speed:>5.1f}cm/s  "
+            f"lane={self._dash_lane:<10s} "
+            f"det={det_str}"
+        )
+
+        # Pad to clear any leftover chars from a longer previous line
+        sys.stdout.write('\r' + line.ljust(160) + '\r')
+        sys.stdout.flush()
 
     def getKey(self):
         tty.setraw(sys.stdin.fileno())
@@ -183,6 +226,64 @@ class RemoteControlTransmitterProcess(Node):
 
     # Removed old publish_manual_command logic as RcBrain handles it
 
+    # ── Sign Detection / State Machine ──────────────────────────────
+    def detection_callback(self, msg: Float64MultiArray):
+        """Receive sign detections from SignDetector and feed them into StateChanger."""
+        data = msg.data
+        if len(data) == 0:
+            # No detections this frame – still let the recorder decay counters
+            self.state_changer.record_detection([], [])
+            return
+
+        # Unpack flat list: every 5 elements = [cls_idx, cx, cy, w, h]
+        n = len(data) // 5
+        idxes = []
+        boxes = []
+        for i in range(n):
+            base = i * 5
+            idxes.append(int(data[base]))
+            boxes.append([data[base + 1], data[base + 2],
+                          data[base + 3], data[base + 4]])
+
+        self.state_changer.record_detection(idxes, boxes)
+
+        # Update dashboard detection names
+        sign_names = {
+            0: 'pedestrian', 1: 'cyclist', 2: 'car', 3: 'bus', 4: 'truck',
+            5: 'red_light', 6: 'yellow_light', 7: 'green_light',
+            8: 'crosswalk', 9: 'enter_hwy', 10: 'leave_hwy',
+            11: 'oneway', 12: 'parking', 13: 'priority',
+            14: 'noentry', 15: 'roundabout', 16: 'stop'
+        }
+        self._dash_detections = [sign_names.get(i, str(i)) for i in idxes]
+
+    def state_timer_callback(self):
+        """Tick the state-changer timer and evaluate mode/speed changes."""
+        now = time.time()
+        dt = now - self.last_state_time
+        self.last_state_time = now
+
+        self.state_changer.update_timer(dt)
+        self.state_changer.change_state()
+
+        new_mode = self.state_changer._get_mode()
+        new_speed = self.state_changer._get_speed()
+
+        # Log state transitions
+        if new_mode != self.prev_car_mode:
+            self.get_logger().warn(
+                f'[SM] Mode: {self.prev_car_mode.name} -> {new_mode.name}')
+            self.prev_car_mode = new_mode
+        if new_speed != self.prev_car_speed:
+            self.get_logger().warn(
+                f'[SM] Speed: {self.prev_car_speed.name} -> {new_speed.name}')
+            self.prev_car_speed = new_speed
+
+        # If the state-machine says STOP and we are in autonomous mode,
+        # immediately publish a zero-speed command so the car halts.
+        if not self.manual_mode and new_speed == CarSpeed.STOP:
+            stop_cmd = {"action": "1", "speed": 0.0}
+            self.publisher.publish(String(data=json.dumps(stop_cmd)))
 
     def left_poly_callback(self, msg):
         self.current_left_poly = msg
@@ -208,12 +309,37 @@ class RemoteControlTransmitterProcess(Node):
         left_poly = np.poly1d(left_coeffs)
         right_poly = np.poly1d(right_coeffs)
         current_speed = 0
+
         # 2. Call your lane keeping algorithm
-        steer, speed, state = self.controller.get_control(left_poly, right_poly, current_speed=current_speed)
+        steer, speed, state = self.controller.get_control(
+            left_poly, right_poly, current_speed=current_speed)
         current_speed = speed
 
-        # 3. Create and publish the command
-        # Send Speed
+        # ── 3. Modulate speed & steer using the state-machine ──────────
+        car_speed_enum = self.state_changer._get_speed()
+        car_mode_enum = self.state_changer._get_mode()
+
+        if car_speed_enum == CarSpeed.STOP:
+            speed = 0.0
+        elif car_speed_enum == CarSpeed.SLOW:
+            # Cap speed to SLOW value (cm/s)
+            speed = min(speed, float(CarSpeed.SLOW.value))
+        elif car_speed_enum == CarSpeed.FAST:
+            # Allow higher speed up to FAST value (cm/s)
+            speed = max(speed, float(CarSpeed.FAST.value))
+        # else NORMAL – keep lane-keeping speed as-is
+
+        # Mode-based steering adjustments (placeholder hooks)
+        if car_mode_enum == CarMode.PARKING:
+            # Parking mode: reduce speed further; steering handled by lane-keeping for now
+            speed = min(speed, float(CarSpeed.SLOW.value))
+        elif car_mode_enum == CarMode.OVERTAKING:
+            # Future: bias steer to avoid vehicle ahead
+            pass
+        elif car_mode_enum == CarMode.TAILING:
+            speed = min(speed, float(CarSpeed.SLOW.value))
+
+        # 4. Create and publish the command
         # Convert cm/s (controller) to m/s (gazebo)
         speed_cmd = {
             "action": "1",
@@ -227,6 +353,12 @@ class RemoteControlTransmitterProcess(Node):
             "steerAngle": float(steer)
         }
         self.publisher.publish(String(data=json.dumps(steer_cmd)))
+
+        # Update dashboard state
+        self._dash_steer = float(steer)
+        self._dash_speed = float(speed)
+        self._dash_lane = str(state)
+        self._print_dashboard()
 
 
 def main(args=None):

@@ -21,19 +21,19 @@ class LaneDetector:
         # wider/narrower than reality, this might need manual tuning.
         self.LANE_WIDTH_PIX = int(REAL_LANE_WIDTH_CM / self.xm_per_pix)
         
-        src = np.float32([
+        src = np.array([
             [img_w * 0.2, img_h * 0.30],  # Top Left (Narrower)
             [img_w * 0.8, img_h * 0.30],  # Top Right
             [img_w * 1, img_h * 0.63],    # Bot Right (Wider)
             [img_w * 0, img_h * 0.63]     # Bot Left
-        ])
+        ], dtype=np.float32)
         
-        dst = np.float32([
+        dst = np.array([
             [img_w * 0.2, 0],
             [img_w * 0.8, 0],
             [img_w * 0.8, img_h],
             [img_w * 0.2, img_h]
-        ])
+        ], dtype=np.float32)
 
         self.M = cv2.getPerspectiveTransform(src, dst)
         self.Minv = cv2.getPerspectiveTransform(dst, src)

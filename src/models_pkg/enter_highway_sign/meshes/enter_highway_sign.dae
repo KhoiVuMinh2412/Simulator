@@ -41,7 +41,7 @@
   </library_effects>
   <library_images>
     <image id="highway_on_png" name="highway_on_png">
-      <init_from>highway_on.png</init_from>
+      <init_from>../materials/textures/enter_highway_sign.png</init_from>
     </image>
   </library_images>
   <library_materials>

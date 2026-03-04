@@ -58,7 +58,7 @@ class trafficlight():
 
     #Function that publishes into the TL Topic the TL message (id and state)
     def sendState(self, id, state):
-        self.trafficlights[id].publish(Byte(data=state.to_bytes(1)))
+        self.trafficlights[id].publish(Byte(data=state.to_bytes(1, byteorder='big')))
 
     def run(self):
         # The middle intersection 

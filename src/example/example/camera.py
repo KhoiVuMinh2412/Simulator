@@ -33,8 +33,8 @@ import rclpy
 from rclpy.node import Node
 import cv2
 import numpy as np
-# from .lane_detection import LaneDetector
 from .lane_detection_short import LaneDetector
+# from .lane_detection_offset_here import LaneDetector
 from std_msgs.msg import Float64MultiArray
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
@@ -75,13 +75,13 @@ class CameraHandler(Node):
             if hasattr(left_poly, 'c'): # Check if it's a poly1d object which has coefficients 'c'
                 left_poly_msg.data = left_poly.c.tolist()
             else:
-                 left_poly_msg.data = left_poly.tolist()
+                 left_poly_msg.data = list(left_poly)
 
             right_poly_msg = Float64MultiArray()
             if hasattr(right_poly, 'c'):
                  right_poly_msg.data = right_poly.c.tolist()
             else:
-                right_poly_msg.data = right_poly.tolist()
+                right_poly_msg.data = list(right_poly)
 
             self.left_poly_pub.publish(left_poly_msg)
             self.right_poly_pub.publish(right_poly_msg)
@@ -114,11 +114,11 @@ class CameraHandler(Node):
             left_plot_x = (left_real_x / xm_per_pix) + center_offset
             
             # Format points for cv2.polylines
-            pts_left = np.array([np.transpose(np.vstack([left_plot_x, plot_y]))])
+            pts_left = np.transpose(np.vstack([left_plot_x, plot_y]))
             pts_left = pts_left.astype(np.int32)
             
             # Draw Left Lane (Red)
-            cv2.polylines(debug_view, pts_left, isClosed=False, color=(0, 0, 255), thickness=5)
+            cv2.polylines(debug_view, [pts_left], isClosed=False, color=(0, 0, 255), thickness=5)
 
         if right_poly is not None:
              # 1. P(y_real) -> x_real
@@ -127,15 +127,15 @@ class CameraHandler(Node):
             right_plot_x = (right_real_x / xm_per_pix) + center_offset
             
             # Format points
-            pts_right = np.array([np.transpose(np.vstack([right_plot_x, plot_y]))])
+            pts_right = np.transpose(np.vstack([right_plot_x, plot_y]))
             pts_right = pts_right.astype(np.int32)
             
             # Draw Right Lane (Blue)
-            cv2.polylines(debug_view, pts_right, isClosed=False, color=(255, 0, 0), thickness=5)
+            cv2.polylines(debug_view, [pts_right], isClosed=False, color=(255, 0, 0), thickness=5)
         # ---------------------------
 
-        cv2.imshow("Frame preview", self.cv_image)
-        cv2.imshow("Debug View (What computer sees)", debug_view)
+        cv2.imshow("Main Camera", self.cv_image)
+        cv2.imshow("Lane Drawing", debug_view)
         key = cv2.waitKey(1)
     
 
