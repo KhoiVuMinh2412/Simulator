@@ -108,7 +108,7 @@
 		 <diffuse>0 255 0 0</diffuse>
 		 <specular>0 255 0 0</specular>
 		 <attenuation>
-		   <range>5.00</range>
+		   <range>0</range>
 		   <linear>0</linear>
 		   <constant>0.08</constant>
 		   <quadratic>0</quadratic>
@@ -163,7 +163,7 @@
 		 <diffuse>255 255 0 0</diffuse>
 		 <specular>255 255 0 0</specular>
 		 <attenuation>
-		   <range>5.00</range>
+		   <range>0</range>
 		   <linear>0</linear>
        <constant>0.08</constant>
 		   <quadratic>0</quadratic>
@@ -216,7 +216,7 @@
 		 <diffuse>255 0 0 0</diffuse>
 		 <specular>255 0 0 0</specular>
 		 <attenuation>
-		   <range>5.00</range>
+		   <range>0</range>
 		   <linear>0</linear>
        <constant>0.08</constant>
 		   <quadratic>0</quadratic>
