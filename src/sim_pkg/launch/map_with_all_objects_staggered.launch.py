@@ -58,26 +58,21 @@ def generate_launch_description():
         _include('roundabout_signs.launch'),
     ])
 
-    # ── Group 5: Stop signs (delay 32s) — 8 entities ────────────────
+    # ── Group 5: Stop signs + pedestrian objects (delay 32s) ────────
     group5 = TimerAction(period=32.0, actions=[
         _include('stop_signs.launch'),
-    ])
-
-    # ── Group 6: Obstacles + pedestrians (delay 40s) — 9 entities ───
-    group6 = TimerAction(period=40.0, actions=[
-        _include('obstacle_car.launch'),
         _include('pedestrian_objects.launch'),
     ])
 
-    # ── Group 7: Members / parking spots (delay 48s) — 20 entities ──
-    group7 = TimerAction(period=48.0, actions=[
-        _include('members.launch'),
-    ])
+    # ── Group 6: (delay 40s) ─────────────────────────────────────────
+    # obstacle_car and pedestrian_objects removed to reduce Gazebo load
+
+    # ── Group 7: Members removed to reduce Gazebo load ──
 
     # ── Group 8: Traffic lights + misc (delay 60s) — 7 entities ─────
     group8 = TimerAction(period=60.0, actions=[
         _include('ramp.launch'),
-        _include('roadblock.launch'),
+        # roadblock removed to reduce Gazebo load
         _include('traffic_lights.launch'),
     ])
 
@@ -88,7 +83,5 @@ def generate_launch_description():
         group3,
         group4,
         group5,
-        group6,
-        group7,
         group8,
     ])
