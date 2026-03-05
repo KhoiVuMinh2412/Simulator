@@ -13,7 +13,7 @@
 #include "pedestrian_object_plugin.h"
 
 // This is the distance that triggers the pedestrian
-#define CAR_DIST_METER 0.5
+#define CAR_DIST_METER 2.0
 
 namespace gazebo
 {
