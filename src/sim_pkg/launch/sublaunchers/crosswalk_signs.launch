@@ -4,39 +4,57 @@
 
   <!-- CROSSWALK SIGNS -->
   <node
-		name  = "CWALK_K"
-	 	pkg   = "gazebo_ros"
-   		exec = "spawn_entity.py"
-   		args  = "-file $(find-pkg-share models_pkg)/crosswalk_sign/model.sdf -entity CWALK_K -x 7.312 -y -3.240 -z 0.078998 -R 0  -P 0  -Y 3.141592"/>
+      name  = "CWALK_1"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/crosswalk_sign/model.sdf -entity CWALK_1 -x 0.812755 -y -4.927258 -z 0.078998 -R 0 -P 0 -Y 1.619466"/>
 
   <node
-		name  = "CWALK_L"
-	 	pkg   = "gazebo_ros"
-   		exec = "spawn_entity.py"
-   		args  = "-file $(find-pkg-share models_pkg)/crosswalk_sign/model.sdf -entity CWALK_L -x 6.627 -y -4.181 -z 0.078998 -R 0  -P 0  -Y 0"/>
+      name  = "CWALK_2"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/crosswalk_sign/model.sdf -entity CWALK_2 -x 1.364650 -y -3.710400 -z 0.078998 -R 0 -P 0 -Y 3.141591"/>
 
   <node
-		name  = "CWALK_M"
-	 	pkg   = "gazebo_ros"
-   		exec = "spawn_entity.py"
-   		args  = "-file $(find-pkg-share models_pkg)/crosswalk_sign/model.sdf -entity CWALK_M -x 6.777 -y -1.456 -z 0.078998 -R 0  -P 0  -Y 3.141592"/>
+      name  = "CWALK_3"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/crosswalk_sign/model.sdf -entity CWALK_3 -x 3.992159 -y -7.054634 -z 0.078998 -R 0 -P 0 -Y 1.570801"/>
 
   <node
-		name  = "CWALK_N"
-	 	pkg   = "gazebo_ros"
-   		exec = "spawn_entity.py"
-   		args  = "-file $(find-pkg-share models_pkg)/crosswalk_sign/model.sdf -entity CWALK_N -x 6.130 -y -2.342 -z 0.078998 -R 0  -P 0  -Y 0"/>
+      name  = "CWALK_4"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/crosswalk_sign/model.sdf -entity CWALK_4 -x 3.203553 -y -6.248319 -z 0.078998 -R 0 -P 0 -Y -1.561409"/>
 
   <node
-		name  = "CWALK_O"
-	 	pkg   = "gazebo_ros"
-   		exec = "spawn_entity.py"
-   		args  = "-file $(find-pkg-share models_pkg)/crosswalk_sign/model.sdf -entity CWALK_O -x 1.109 -y -12.486 -z 0.078998 -R 0  -P 0  -Y 1.570796"/>
+      name  = "CWALK_5"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/crosswalk_sign/model.sdf -entity CWALK_5 -x 6.306997 -y -11.308648 -z 0.078998 -R 0 -P 0 -Y 0.006926"/>
 
   <node
-		name  = "CWALK_P"
-	 	pkg   = "gazebo_ros"
-   		exec = "spawn_entity.py"
-   		args  = "-file $(find-pkg-share models_pkg)/crosswalk_sign/model.sdf -entity CWALK_P -x 0.195 -y -11.869 -z 0.078998 -R 0  -P 0  -Y 4.712388"/>
+      name  = "CWALK_6"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/crosswalk_sign/model.sdf -entity CWALK_6 -x 6.883880 -y -10.336000 -z 0.078998 -R 0 -P 0 -Y -3.139471"/>
+
+  <node
+      name  = "CWALK_7"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/crosswalk_sign/model.sdf -entity CWALK_7 -x 10.712900 -y -11.679620 -z 0.077226 -R 0 -P 0 -Y -1.554339"/>
+
+  <node
+      name  = "CWALK_8"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/crosswalk_sign/model.sdf -entity CWALK_8 -x 12.446000 -y -12.324800 -z 0.078998 -R 0 -P 0 -Y 1.576668"/>
+
+  <node
+      name  = "CWALK_9"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/crosswalk_sign/model.sdf -entity CWALK_9 -x 5.772590 -y -14.523700 -z 0.078998 -R 0 -P 0 -Y 0.008698"/>
 
 </launch>

@@ -4,21 +4,9 @@
 
   <!-- ONE WAY SIGNS -->
   <node
-      name  = "ONEWAY_J"
+      name  = "ONW_1"
       pkg   = "gazebo_ros"
       exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/oneway_sign/model.sdf -entity ONEWAY_J -x 3.341 -y -9.821 -z 0.078998 -R 0 -P 0 -Y 1.570796"/>
-
-  <node
-      name  = "ONEWAY_B"
-      pkg   = "gazebo_ros"
-      exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/oneway_sign/model.sdf -entity ONEWAY_B -x 2.406 -y -9.821 -z 0.078998 -R 0 -P 0 -Y 1.570796"/>
-  
-  <node
-      name  = "ONEWAY_E"
-      pkg   = "gazebo_ros"
-      exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/oneway_sign/model.sdf -entity ONEWAY_E -x 9.196 -y -14.375 -z 0.078998 -R 0 -P 0 -Y 0"/>
+      args  = "-file $(find-pkg-share models_pkg)/oneway_sign/model.sdf -entity ONW_1 -x 4.243440 -y -14.522900 -z 0.078998 -R 0 -P 0 -Y 0.043443"/>
 
 </launch>

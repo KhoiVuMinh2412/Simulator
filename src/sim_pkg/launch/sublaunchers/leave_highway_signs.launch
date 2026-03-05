@@ -4,21 +4,15 @@
 
   <!-- LEAVE HIGHWAY SIGNS -->
   <node
-      name  = "LHIGH_U"
+      name  = "LHIGH_1"
       pkg   = "gazebo_ros"
       exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/leave_highway_sign/model.sdf -entity LHIGH_U -x 10.686 -y -6.276 -z 0.078998 -R 0  -P 0  -Y 4.712388"/>
-  
-  <node
-      name  = "LHIGH_Z"
-      pkg   = "gazebo_ros"
-      exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/leave_highway_sign/model.sdf -entity LHIGH_Z -x 6.520 -y -12.700 -z 0.078998 -R 0  -P 0  -Y 0"/>
+      args  = "-file $(find-pkg-share models_pkg)/leave_highway_sign/model.sdf -entity LHIGH_1 -x 4.560760 -y -1.384930 -z 0.078998 -R 0 -P 0 -Y 0"/>
 
   <node
-      name  = "LHIGH_H"
+      name  = "LHIGH_2"
       pkg   = "gazebo_ros"
       exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/leave_highway_sign/model.sdf -entity LHIGH_H -x 8.458 -y -14.359 -z 0.078998 -R 0  -P 0  -Y -3.15"/>
+      args  = "-file $(find-pkg-share models_pkg)/leave_highway_sign/model.sdf -entity LHIGH_2 -x 10.312300 -y -3.897600 -z 0.078998 -R 0 -P 0 -Y 3.139779"/>
 
 </launch>

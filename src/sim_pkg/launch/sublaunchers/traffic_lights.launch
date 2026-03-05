@@ -12,24 +12,24 @@
       name  = "start"
       pkg   = "gazebo_ros"
       exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/traffic_light/model.sdf -entity start -x 1.132 -y -14.403 -z 0 -R 0 -P 0 -Y 4.712388"/>
+      args  = "-file $(find-pkg-share models_pkg)/traffic_light/model.sdf -entity start -x 1.579957 -y -9.906942 -z 0 -R 0 -P 0 -Y 1.579477"/>
 
   <node
       name  = "master"
       pkg   = "gazebo_ros"
       exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/traffic_light/model.sdf -entity master -x 2.030 -y -11.132 -z 0 -R 0 -P 0 -Y 3.141592"/>
+      args  = "-file $(find-pkg-share models_pkg)/traffic_light/model.sdf -entity master -x 1.293995 -y -11.350941 -z 0 -R 0 -P 0 -Y 3.141591"/>
 
   <node
       name  = "slave"
       pkg   = "gazebo_ros"
       exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/traffic_light/model.sdf -entity slave -x 3.744 -y -10.140 -z 0 -R 0 -P 0 -Y 0"/>
+      args  = "-file $(find-pkg-share models_pkg)/traffic_light/model.sdf -entity slave -x 2.561127 -y -10.295938 -z 0 -R 0 -P 0 -Y 0"/>
   
   <node
       name  = "antimaster"
       pkg   = "gazebo_ros"
       exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/traffic_light/model.sdf -entity antimaster -x 3.347 -y -11.483 -z 0 -R 0 -P 0 -Y 4.712388"/>
+      args  = "-file $(find-pkg-share models_pkg)/traffic_light/model.sdf -entity antimaster -x 2.339301 -y -11.715791 -z 0 -R 0 -P 0 -Y -1.570801"/>
 
 </launch>

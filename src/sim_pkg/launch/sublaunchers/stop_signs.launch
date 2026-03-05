@@ -1,54 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <launch>
-  
+
   <!-- STOP SIGNS -->
   <node
-      name  = "STOP_A"
+      name  = "STO_1"
       pkg   = "gazebo_ros"
       exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/stop_sign/model.sdf -entity STOP_A -x 2.103 -y -14.004 -z 0.079 -R 0 -P 0 -Y 0"/>
+      args  = "-file $(find-pkg-share models_pkg)/stop_sign/model.sdf -entity STO_1 -x 1.089450 -y -7.176970 -z 0.137238 -R 0 -P 0 -Y -3.131781"/>
 
   <node
-      name  = "STOP_C"
+      name  = "STO_2"
       pkg   = "gazebo_ros"
       exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/stop_sign/model.sdf -entity STOP_C -x 4.272 -y -11.153 -z 0.078998 -R 0  -P 0  -Y 3.141592"/>
+      args  = "-file $(find-pkg-share models_pkg)/stop_sign/model.sdf -entity STO_2 -x 1.603370 -y -13.184300 -z 0.078998 -R 0 -P 0 -Y -1.570801"/>
 
   <node
-      name  = "STOP_E"
+      name  = "STO_3"
       pkg   = "gazebo_ros"
       exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/stop_sign/model.sdf -entity STOP_E -x 0.217 -y -9.870 -z 0.078998 -R 0  -P 0  -Y 4.712388"/>
+      args  = "-file $(find-pkg-share models_pkg)/stop_sign/model.sdf -entity STO_3 -x 4.937620 -y -11.339200 -z 0.078998 -R 0 -P 0 -Y 1.571696"/>
 
   <node
-      name  = "STOP_G"
+      name  = "STO_4"
       pkg   = "gazebo_ros"
       exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/stop_sign/model.sdf -entity STOP_G -x 1.129 -y -7.602 -z 0.078998 -R 0  -P 0  -Y 1.570796"/>
+      args  = "-file $(find-pkg-share models_pkg)/stop_sign/model.sdf -entity STO_4 -x 10.737200 -y -9.958840 -z 0.078998 -R 0 -P 0 -Y -1.562594"/>
 
   <node
-      name  = "STOP_W"
+      name  = "STO_5"
       pkg   = "gazebo_ros"
       exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/stop_sign/model.sdf -entity STOP_W -x 12.603 -y -4.515 -z 0.078998 -R 0  -P 0  -Y 1.570796"/>
-
-  <node
-      name  = "STOP_H"
-      pkg   = "gazebo_ros"
-      exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/stop_sign/model.sdf -entity STOP_H -x 4.327 -y -14.023 -z 0.078998 -R 0  -P 0  -Y 0"/>
- 
-  <node
-      name  = "STOP_F"
-      pkg   = "gazebo_ros"
-      exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/stop_sign/model.sdf -entity STOP_F -x 4.298 -y -7.342 -z 0.078998 -R 0  -P 0  -Y 0"/>
-
-   <node
-      name  = "STOP_I"
-      pkg   = "gazebo_ros"
-      exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/stop_sign/model.sdf -entity STOP_I -x 1.423 -y -6.287 -z 0.078998 -R 0  -P 0  -Y  3.141592"/>
+      args  = "-file $(find-pkg-share models_pkg)/stop_sign/model.sdf -entity STO_5 -x 10.743907 -y -13.562353 -z 0.078998 -R 0 -P 0 -Y -1.562590"/>
 
 </launch>

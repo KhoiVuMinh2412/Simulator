@@ -2,23 +2,29 @@
 
 <launch>
 
-  <!-- ROUNABOUT SIGNS -->
+  <!-- ROUNDABOUT SIGNS -->
   <node
-      name  = "GIR_Q"
+      name  = "ROU_1"
       pkg   = "gazebo_ros"
       exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/roundabout_sign/model.sdf -entity GIR_Q -x 8.766 -y -4.179 -z 0.078998 -R 0  -P 0  -Y 0"/>
+      args  = "-file $(find-pkg-share models_pkg)/roundabout_sign/model.sdf -entity ROU_1 -x 10.686200 -y -3.867930 -z 0.078998 -R 0 -P 0 -Y 0"/>
 
   <node
-      name  = "GIR_R"
+      name  = "ROU_2"
       pkg   = "gazebo_ros"
       exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/roundabout_sign/model.sdf -entity GIR_R -x 10.320 -y -4.869 -z 0.078998 -R 0  -P 0  -Y 1.570796"/>
-  
+      args  = "-file $(find-pkg-share models_pkg)/roundabout_sign/model.sdf -entity ROU_2 -x 12.330900 -y -2.931550 -z 0.078998 -R 0 -P 0 -Y -3.118710"/>
+
   <node
-      name  = "GIR_S"
+      name  = "ROU_3"
       pkg   = "gazebo_ros"
       exec = "spawn_entity.py"
-      args  = "-file $(find-pkg-share models_pkg)/roundabout_sign/model.sdf -entity GIR_S -x 11.015 -y -3.297 -z 0.078998 -R 0  -P 0  -Y 3.141592"/>
-  
+      args  = "-file $(find-pkg-share models_pkg)/roundabout_sign/model.sdf -entity ROU_3 -x 11.815000 -y -4.638250 -z 0.078998 -R 0 -P 0 -Y 1.573959"/>
+
+  <node
+      name  = "ROU_4"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/roundabout_sign/model.sdf -entity ROU_4 -x 11.162100 -y -2.164220 -z 0.078998 -R 0 -P 0 -Y -1.588850"/>
+
 </launch>

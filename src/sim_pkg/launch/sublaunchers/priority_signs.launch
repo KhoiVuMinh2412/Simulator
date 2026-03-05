@@ -1,30 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <launch>
-  
+
   <!-- PRIORITY SIGNS -->
   <node
-	name  = "PRIOR_D"
-	pkg   = "gazebo_ros"
-	exec = "spawn_entity.py"
-	args  = "-file $(find-pkg-share models_pkg)/priority_sign/model.sdf -entity PRIOR_D -x 3.675 -y -13.050 -z 0.078998 -R 0  -P 0  -Y 3.141592"/>
+      name  = "PRIOR_1"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/priority_sign/model.sdf -entity PRIOR_1 -x 1.361317 -y -14.524393 -z 0.078998 -R 0 -P 0 -Y -0.011524"/>
 
   <node
-	name  = "PRIOR_F"
-	pkg   = "gazebo_ros"
-	exec = "spawn_entity.py"
-	args  = "-file $(find-pkg-share models_pkg)/priority_sign/model.sdf -entity PRIOR_F -x 0.204 -y -6.031 -z 0.078998 -R 0  -P 0  -Y 4.712388"/>
+      name  = "PRIOR_2"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/priority_sign/model.sdf -entity PRIOR_2 -x 2.872540 -y -14.507100 -z 0.078998 -R 0 -P 0 -Y -0.011522"/>
 
   <node
-	name  = "PRIOR_H"
-	pkg   = "gazebo_ros"
-	exec = "spawn_entity.py"
-	args  = "-file $(find-pkg-share models_pkg)/priority_sign/model.sdf -entity PRIOR_H -x 5.544 -y -11.381 -z 0.078998 -R 0  -P 0  -Y 1.570796"/>
+      name  = "PRIOR_3"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/priority_sign/model.sdf -entity PRIOR_3 -x 10.426800 -y -14.514600 -z 0.078998 -R 0 -P 0 -Y -0.011522"/>
 
   <node
-	name  = "PRIOR_I"
-	pkg   = "gazebo_ros"
-	exec = "spawn_entity.py"
-	args  = "-file $(find-pkg-share models_pkg)/priority_sign/model.sdf -entity PRIOR_I -x 4.589 -y -5.997 -z 0.078998 -R 0  -P 0  -Y 4.712388"/>
+      name  = "PRIOR_4"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/priority_sign/model.sdf -entity PRIOR_4 -x 0.067525 -y -3.366090 -z 0.078998 -R 0 -P 0 -Y -1.570801"/>
+
+  <node
+      name  = "PRIOR_5"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/priority_sign/model.sdf -entity PRIOR_5 -x 0.073268 -y -6.790090 -z 0.078998 -R 0 -P 0 -Y -1.570801"/>
+
+  <node
+      name  = "PRIOR_6"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/priority_sign/model.sdf -entity PRIOR_6 -x 0.069522 -y -9.971150 -z 0.078998 -R 0 -P 0 -Y -1.570801"/>
+
+  <node
+      name  = "PRIOR_7"
+      pkg   = "gazebo_ros"
+      exec = "spawn_entity.py"
+      args  = "-file $(find-pkg-share models_pkg)/priority_sign/model.sdf -entity PRIOR_7 -x 2.491064 -y -7.169462 -z 0.078998 -R 0 -P 0 -Y 3.137395"/>
 
 </launch>
