@@ -49,7 +49,8 @@ class StateChanger:
             15: 'roundabout_sign',
             16: 'stop_sign'
         }
-        # To be tuned
+        # Detection-count thresholds: signs need more consistent detections
+        # to avoid triggering from a single noisy frame.
         self.det_threshold = {
             'pedestrian': 3,
             'cyclist': 3,
@@ -59,45 +60,41 @@ class StateChanger:
             'red_light': 3,
             'yellow_light': 3,
             'green_light': 3,
-            'crosswalk_sign': 3,
-            'enter_highway_sign': 3,
-            'leave_highway_sign': 3,
-            'oneway_sign': 3,
-            'parking_sign': 3,
-            'priority_sign': 3,
-            'noentry_sign': 3,
-            'roundabout_sign': 3,
-            'stop_sign': 3
+            'crosswalk_sign': 5,
+            'enter_highway_sign': 5,
+            'leave_highway_sign': 5,
+            'oneway_sign': 5,
+            'parking_sign': 5,
+            'priority_sign': 5,
+            'noentry_sign': 5,
+            'roundabout_sign': 5,
+            'stop_sign': 5
         }
-        self.cur_dets = {key: 0 for key in [
-            'pedestrian',
-            'cyclist',
-            'car',
-            'bus',
-            'truck',
-            'red_light',
-            'yellow_light',
-            'green_light',
-            'crosswalk_sign',
-            'enter_highway_sign',
-            'leave_highway_sign',
-            'oneway_sign',
-            'parking_sign',
-            'priority_sign',
-            'noentry_sign',
-            'roundabout_sign',
-            'stop_sign'
-        ]}
+        self.cur_dets = {key: 0 for key in self.classes}
+
+        # ── Latched state ─────────────────────────────────────────────
+        # Sign-triggered speed/mode persist until another sign overrides
+        # them.  Dynamic detections (pedestrian, red light, …) still
+        # override temporarily but the latch is the fallback.
+        self._latched_speed: CarSpeed = CarSpeed.NORMAL
+        self._latched_mode: CarMode = CarMode.STRAIGHT
 
     def record_detection(self, idxes, boxes):
         def get_max_cnt(cls, coeff=1):
             return int(self.det_threshold[cls] * coeff)
         
-        # To be tuned
         def significant_sign(box, aspect_ratio, err_rate, area_threshold):
+            """Return True when the bounding box matches the expected aspect
+            ratio (within *err_rate* tolerance) AND the normalised area is
+            at least *area_threshold*."""
             aspect_ratio_met =  aspect_ratio * (1 - err_rate) <= box[-2] / box[-1] <= aspect_ratio * (1 + err_rate)
             area_met = box[-2] * box[-1] >= area_threshold
             return aspect_ratio_met and area_met
+
+        # Signs that set a persistent (latched) driving mode — they need
+        # a stricter area gate so far-away detections are ignored.
+        _SIGN_AREA_THRESHOLD = 0.012   # ~3.5 % of image  ≈ sign is close
+        _SIGN_HIGHWAY_AREA   = 0.008   # highway signs are taller / thinner
 
         dets = [self.idx_to_cls[i] for i in idxes]
         accepted_dets = []
@@ -107,18 +104,25 @@ class StateChanger:
             elif d in ['car', 'bus', 'truck'] and significant_sign(b, 1/1, 0.7, 0.004):
                 accepted_dets.append(d)
             elif d in self.classes[5:7] and significant_sign(b, 1/3.5, 0.9, 0.002):
+                # Traffic lights — keep original area gate (small but visible)
                 accepted_dets.append(d)
             elif d in self.classes[7:]:
-                if d in ['enter_highway_sign', 'leave_highway_sign'] and significant_sign(b, 2/3, 0.9, 0.002):
+                if d in ['enter_highway_sign', 'leave_highway_sign'] and significant_sign(b, 2/3, 0.9, _SIGN_HIGHWAY_AREA):
                     accepted_dets.append(d)
-                elif significant_sign(b, 1/1, 0.9, 0.006):
+                elif significant_sign(b, 1/1, 0.9, _SIGN_AREA_THRESHOLD):
                     accepted_dets.append(d)
 
         for c in list(self.cur_dets.keys()):
             if c in accepted_dets:
                 self.cur_dets[c] = min(self.cur_dets[c] + 1, get_max_cnt(c))
             else:
-                self.cur_dets[c] = max(self.cur_dets[c] - 2, 0)
+                # Signs decay slowly (-1) so the counter doesn't collapse
+                # the moment the sign leaves the frame.  Dynamic objects
+                # (pedestrians, vehicles, lights) decay faster (-2).
+                if c in self.classes[8:]:     # index 8+ are all *_sign
+                    self.cur_dets[c] = max(self.cur_dets[c] - 1, 0)
+                else:
+                    self.cur_dets[c] = max(self.cur_dets[c] - 2, 0)
 
     def record_lookup(self, yaw_diffs):
         self.lookup_yaw_diffs = yaw_diffs
@@ -127,17 +131,51 @@ class StateChanger:
         self.timer += dt
 
     def change_state(self):
-        '''Handles changes based on the detection recorder'''
+        '''Handles changes based on the detection recorder.
+
+        Sign-triggered states (highway, roundabout, oneway …) are
+        **latched**: they persist until a *different* sign overrides them.
+        Dynamic detections (pedestrian, red light, vehicles …) can still
+        override temporarily; once they clear the latched state takes
+        effect again.
+        '''
         # threshold check util
         def threshold_met(cls):
             return self.cur_dets[cls] >= self.det_threshold[cls]
+
+        def threshold_met_contextual(cls, override_threshold):
+            """Like threshold_met but uses a lower count when context
+            justifies it (e.g. expecting a sign at high speed)."""
+            return self.cur_dets[cls] >= override_threshold
 
         def turn_met(self):
             if len(self.lookup_yaw_diffs) == 0:
                 return False
             return max(self.lookup_yaw_diffs) > 30
 
-        # ── Speed handling (priority order: highest-priority first) ────
+        # ── 1. Update latched speed/mode when a sign threshold is met ──
+        #    These writes only happen the moment the counter crosses the
+        #    threshold. The latch survives long after the sign is no
+        #    longer visible.
+        #
+        #    Contextual thresholds: when already on the highway (FAST),
+        #    the car passes the leave_highway sign very quickly. Use a
+        #    reduced threshold (2) so that even a brief sighting triggers.
+        _LEAVE_HWY_THRESH = 2 if self._latched_speed == CarSpeed.FAST else self.det_threshold['leave_highway_sign']
+
+        if threshold_met('enter_highway_sign'):
+            self._latched_speed = CarSpeed.FAST
+        if threshold_met_contextual('leave_highway_sign', _LEAVE_HWY_THRESH):
+            self._latched_speed = CarSpeed.NORMAL
+        if threshold_met('oneway_sign'):
+            self._latched_speed = CarSpeed.NORMAL
+            self._latched_mode = CarMode.STRAIGHT
+        if threshold_met('roundabout_sign'):
+            self._latched_mode = CarMode.TURN
+        if threshold_met('parking_sign'):
+            self._latched_mode = CarMode.PARKING
+
+        # ── 2. Speed handling (priority order: highest-priority first) ─
         if self.stop_halt:
             if self.timer < self.time_checkpoint + 1.0:  # set back to 3.0 irl
                 self.cur_speed = CarSpeed.STOP
@@ -166,29 +204,18 @@ class StateChanger:
             self.cur_speed = CarSpeed.SLOW
         elif threshold_met('green_light'):
             self.cur_speed = CarSpeed.NORMAL
-        elif threshold_met('oneway_sign'):
-            self.cur_speed = CarSpeed.NORMAL
-        elif threshold_met('priority_sign'):
-            self.cur_speed = CarSpeed.NORMAL
-        elif threshold_met('leave_highway_sign') and self._get_speed() == CarSpeed.FAST:
-            self.cur_speed = CarSpeed.NORMAL
-        elif threshold_met('enter_highway_sign'):
-            self.cur_speed = CarSpeed.FAST
         else:
-            # Nothing detected — return to NORMAL (don't stay stuck in STOP)
-            self.cur_speed = CarSpeed.NORMAL
+            # No dynamic detection overriding — fall back to latched speed
+            self.cur_speed = self._latched_speed
 
-        # ── Mode handling (frequency based) ────────────────────────────
-        if threshold_met('oneway_sign'):
-            self.cur_mode = CarMode.STRAIGHT
-        if turn_met(self) or threshold_met('roundabout_sign'):
+        # ── 3. Mode handling ───────────────────────────────────────────
+        if turn_met(self):
             self.cur_mode = CarMode.TURN
         elif threshold_met('car') or threshold_met('truck') or threshold_met('bus'):
             self.cur_mode = CarMode.TAILING if self._get_speed() == CarSpeed.SLOW else CarMode.OVERTAKING
-        elif threshold_met('parking_sign'):
-            self.cur_mode = CarMode.PARKING
         else:
-            self.cur_mode = CarMode.STRAIGHT
+            # No dynamic detection overriding — fall back to latched mode
+            self.cur_mode = self._latched_mode
 
     def _get_mode(self):
         return self.cur_mode

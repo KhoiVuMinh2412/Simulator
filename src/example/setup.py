@@ -20,6 +20,7 @@ setup(
             'camera = example.camera:main',
             'sign_detector = example.sign_detector:main',
             'reset_car = example.reset_car:main',
+            'car_monitor = example.car_monitor:main',
         ],
     },
 )

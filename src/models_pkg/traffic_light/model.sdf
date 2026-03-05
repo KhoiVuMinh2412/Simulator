@@ -30,7 +30,7 @@
         <material>
           <script>
             <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>PR2/Black</name>
+            <name>Gazebo/Black</name>
           </script>
           <shader type='vertex'>
             <normal_map>__default__</normal_map>
