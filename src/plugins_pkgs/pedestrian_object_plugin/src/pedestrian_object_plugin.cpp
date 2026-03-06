@@ -234,7 +234,7 @@ namespace gazebo
                         // Stop the pedestrian 
                         this->m_speed = calculateVelocity(0);
 
-                        if(timeChecker(this->m_timestamp, this->m_model->GetWorld()->SimTime(), 3)) // if 5 seconds have passed
+                        if(timeChecker(this->m_timestamp, this->m_model->GetWorld()->SimTime(), 5)) // if 5 seconds have passed
                         {   
                             this->m_speed = calculateVelocity(1); // start the pedestrian
                             this->m_state = States::go_to_the_right_side_of_the_road; // send it to 3rd state
@@ -248,7 +248,7 @@ namespace gazebo
                     {   
                         this->m_speed = calculateVelocity(0); // stop the pedestrian
 
-                        if(timeChecker(this->m_timestamp, this->m_model->GetWorld()->SimTime(), 3)) // if 5 seconds have passed
+                        if(timeChecker(this->m_timestamp, this->m_model->GetWorld()->SimTime(), 5)) // if 5 seconds have passed
                         {
                             this->m_speed = calculateVelocity(1); // start the pedestrian
                             this->m_state = States::go_to_the_right_side_of_the_road; // send it to 3rd state
@@ -262,7 +262,7 @@ namespace gazebo
                     {   
                         this->m_speed = calculateVelocity(0); // stop the pedestrian
                                                 
-                        if(timeChecker(this->m_timestamp, this->m_model->GetWorld()->SimTime(), 3)) // if 5 sec have passed
+                        if(timeChecker(this->m_timestamp, this->m_model->GetWorld()->SimTime(), 5)) // if 5 sec have passed
                         {
                             this->m_speed = calculateVelocity(1, false); // start the pedestrian backwards
                             this->m_state = States::return_to_the_left_side_of_the_road; // send it to start state
@@ -278,7 +278,7 @@ namespace gazebo
                         this->m_speed = calculateVelocity(0); // stop the pedestrian
 
                     
-                        if(timeChecker(this->m_timestamp, this->m_model->GetWorld()->SimTime(), 8)) // if 10 sec have passed
+                        if(timeChecker(this->m_timestamp, this->m_model->GetWorld()->SimTime(), 10)) // if 10 sec have passed
                         {
                             this->m_state = States::wait_for_car; // send it to wait_for_car state
                         }

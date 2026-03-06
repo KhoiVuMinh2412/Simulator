@@ -23,8 +23,11 @@ setup(
             'camera = example.camera:main',
             'sign_detector = example.sign_detector:main',
             'reset_car = example.reset_car:main',
+<<<<<<< HEAD
             'car_monitor = example.car_monitor:main',
             'navigator = example.navigator:main',
+=======
+>>>>>>> parent of bb1508a (final)
         ],
     },
 )

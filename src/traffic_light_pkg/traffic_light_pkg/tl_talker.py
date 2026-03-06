@@ -12,7 +12,6 @@
 
 import rclpy
 import rclpy.time
-import time
 
 from std_msgs.msg import Byte
 from itertools import cycle
@@ -35,8 +34,8 @@ class trafficlight():
     
     def __init__(self):
         #Constants
-        #Time for traffic light to change colors in seconds (in seconds)
-        self.TL_interval = 1.0
+        #Time for traffic light to change colors in seconds
+        self.TL_interval = rclpy.time.Duration(seconds=1)
 
         #Initialize the node
         rclpy.init()
@@ -55,6 +54,7 @@ class trafficlight():
         self.trafficlights.append(tlst)
 
         self.node = node
+        self.rate = node.create_rate(10)
 
     #Function that publishes into the TL Topic the TL message (id and state)
     def sendState(self, id, state):
@@ -84,10 +84,10 @@ class trafficlight():
     
         # Cycles of patterns
         self.maincycle       = cycle(self.pattern)      
-        self.last_time = time.time() - 2.0
+        self.last_time = self.node.get_clock().now() - self.TL_interval - self.TL_interval
 
         while rclpy.ok():
-            current_time = time.time()
+            current_time = self.node.get_clock().now()
             if current_time - self.last_time > self.TL_interval:
                 self.main_state = next(self.maincycle)
                 self.last_time  = current_time
@@ -102,7 +102,7 @@ class trafficlight():
             #Send State for the start semaphore
             self.sendState(3, self.mirrorLight(self.main_state))
 
-            time.sleep(0.1) #publish at 10hz
+            self.rate.sleep() #publish at 10hz
 
 
 def main():

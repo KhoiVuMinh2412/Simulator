@@ -4,22 +4,22 @@
   
     <!-- PEDESTRIAN OBSTACLES -->
     <node
-        name  = "PED_1"
+        name  = "PED_OBJ_KL"
         pkg   = "gazebo_ros"
         exec = "spawn_entity.py"
-        args  = "-file $(find-pkg-share models_pkg)/pedestrian_object/model.sdf -entity PED_1 -x 4.019687 -y -6.592800 -z 0 -R 0 -P 0 -Y -1.570791"/>
+        args  = "-file $(find-pkg-share models_pkg)/pedestrian_object/model.sdf -entity PED_OBJ_KL -x 6.427 -y -1.422 -z 0 -R 0 -P 0 -Y 3.141591"/>
 
     <node
-        name  = "PED_2"
+        name  = "PED_OBJ_MN"
         pkg   = "gazebo_ros"
         exec = "spawn_entity.py"
-        args  = "-file $(find-pkg-share models_pkg)/pedestrian_object/model.sdf -entity PED_2 -x 1.998 -y -6.320 -z 0 -R 0 -P 0 -Y 3.141589"/>
+        args  = "-file $(find-pkg-share models_pkg)/pedestrian_object/model.sdf -entity PED_OBJ_MN -x 1.998 -y -6.320 -z 0 -R 0 -P 0 -Y 3.141591"/>
 	
     <node
-        name  = "PED_3"
+        name  = "PED_OBJ_AD_H"
         pkg   = "gazebo_ros"
         exec = "spawn_entity.py"
-        args  = "-file $(find-pkg-share models_pkg)/pedestrian_object/model.sdf -entity PED_3 -x 0.172 -y -12.200 -z 0 -R 0 -P 0 -Y 3.141589"/>
+        args  = "-file $(find-pkg-share models_pkg)/pedestrian_object/model.sdf -entity PED_OBJ_AD_H -x 0.172 -y -12.200 -z 0 -R 0 -P 0 -Y 4.712391"/>
 
 
 </launch>
